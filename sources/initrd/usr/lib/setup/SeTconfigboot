@@ -1,0 +1,13 @@
+#!/bin/sh
+TMP=/var/log/setup/tmp
+if [ ! -d $TMP ]; then
+  mkdir -p $TMP
+fi
+T_PX="`cat $TMP/SeTT_PX`"
+  dialog --title "GENERATE: INITRD AAND GRUB.CFG" --yesno "There is \
+initrd-version.img and grub.cfg are generated. \
+The version of initrd is the same as the kernel version, \
+and the system boot item is configured." 10 68
+    cp -rfa /usr/bin/configboot $T_PX/usr/bin/configboot
+    chroot $T_PX /usr/bin/configboot $1
+    rm -rf $T_PX/usr/bin/configboot

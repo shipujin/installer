@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# create initrd-version.img
+#initrd_versions=`uname -r`
+initrd_versions=`ls /lib/modules/`
+mkinitrd -k ${initrd_versions} -o /boot/initrd-${initrd_versions}.img 
+
+# creat grub.cfg
+grub-mkconfig -o /boot/grub/grub.cfg 1> /dev/null 2> /dev/null
+
+# clean
+# clean tmp initrd
+rm -rf /boot/initrd-tree
+sync
+
+# clean tmp grub config
+rm -rf /tmp/grub.cfg
+
+# EFI
+grub-install  --target=loongarch64-efi --efi-directory=/boot/efi/ --bootloader-id=Slackwareloong 1> /dev/null 2> /dev/null
+pushd /boot/efi
+     mv EFI/Slackwareloong EFI/BOOT
+     mv EFI/BOOT/grubloongarch64.efi EFI/BOOT/BOOTLOONGARCH64.EFI
+popd
+
+# Clean
+history -c

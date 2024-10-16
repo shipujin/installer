@@ -137,6 +137,12 @@ if dmesg | grep "ATAPI CD" 1> /dev/null 2> /dev/null ; then
   done
 fi
 
+# Create grub EFI
+esp_block_device=`df | grep "mnt$" | awk '{print $1}'`
+esp_block_device_num=`echo $esp_block_device | awk '{sub(/.$/, "1"); print}'`
+# Set boot config:
+/usr/lib/setup/SeTconfigboot $esp_block_device_num
+
 # Set root password:
 /usr/lib/setup/SeTpasswd
 
