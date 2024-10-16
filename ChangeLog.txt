@@ -1,0 +1,1210 @@
+Sat Oct  5 21:15:53 UTC 2024
+  Ope, that last one didn't boot because of a wrong CONFIG_PREFIX in
+  busybox-dot-config. Fixed.
++--------------------------+
+Sat Oct  5 19:01:54 UTC 2024
+  It's possible that an unformatted EFI System Partition could still have
+  traces of an old filesystem (such as NTFS) that could cause it to "mount"
+  but then not function correctly. When test-mounting the partition in SeTEFI,
+  specify "-t vfat" to avoid this, and offer to format it if it will not
+  mount as vfat.
+  Thanks to Karl Magnus Kolstø for the bug report.
++--------------------------+
+Fri Oct  4 19:04:54 UTC 2024
+  sources/busybox/busybox-1.18.4.tar.bz2:  Upgraded.
++--------------------------+
+Wed Sep 18 19:31:12 UTC 2024
+  SeTEFI: Fixed a bug where an EFI System Partition would be detected as
+  unformatted if it had a label. Luckily the formatting would also fail. ;-)
+  Thanks to Karl Magnus Kolstø for the bug report.
+  build_installer.sh:  Added ntfs-3g package.
++--------------------------+
+Thu Sep 12 21:55:48 UTC 2024
+  Since huge is gone, I guess the installer's going to be booting generic. :-)
+  On UEFI systems, use GRUB to boot the installer since elilo sucks.
+  Include all the kernel modules. It's not all that much bloat, makes the
+  installer more useful for rescue purposes, and relieves us of having to
+  trace out all the deps for the included kernel modules.
+  Handle having the kernel modules provided by kernel-generic.
+  Handle precompressed modules (but mkinitrd isn't ready for this yet).
++--------------------------+
+Sun Jul 28 20:52:21 UTC 2024
+  /etc/profile: export MANPAGER="less -r" to display pages correctly.
+  Also export LESSQUIET=true.
+  Use real "less".
+  Thanks to Brent Earl.
+  module-blacklist: don't blacklist modules that wouldn't be installed anyway.
+  compress dropbear.8 so that it's converted properly to catman format.
++--------------------------+
+Thu Jul 25 20:06:25 UTC 2024
+  Updated compiler flags for i686 and x86_64.
++--------------------------+
+Fri Jul 12 17:12:33 UTC 2024
+  Upgrade to nano-8.1.
++--------------------------+
+Tue May 28 17:53:49 UTC 2024
+  Add /sbin/zramctl.
+  rc.S: Set up some swap on a ZRAM device.
+  SeTpartitions: Support installing to bcachefs filesystems.
+  SeTpartitions: quit offering reiserfs which will be gone in Linux 6.10.
++--------------------------+
+Sat May 25 17:39:17 UTC 2024
+  Add zram.ko.
++--------------------------+
+Wed May 15 22:32:33 UTC 2024
+  Force compress the hwdata files. Thanks to Stuart Winter.
+  Include rescan_scsi_bus.sh, sg_inq, sg_turs, and libsgutils2 from the
+  sg3_utils package. Thanks to ikocher.
+  Include bcachefs-tools.
+  Add libsodium for bcachefs-tools.
+  No menu-driven installer support yet (nor immediately pending).
++--------------------------+
+Tue May 14 18:24:45 UTC 2024
+  Disable CONFIG_TC in busybox-dot-config.
++--------------------------+
+Wed May  8 09:26:31 UTC 2024
+  build_installer.sh: Switch to the 'pciutils' implementation of 'lspci' since
+  Busybox's implementation lacks the capability to map hardware IDs to model
+  names; a feature we rely on for the conditional loading of Kernel modules on
+  AArch64.
+  gzip the content of /usr/share/hwdata to conserve space.
++--------------------------+
+Mon Mar 18 08:08:08 UTC 2024
+  Added console font 'ter-v18n' to accommodate the Raspberry Pi 400's screen.
+  Thanks to BrianL.
++--------------------------+
+Sun Mar 10 17:49:27 UTC 2024
+  mkbindmounts: also bind mount /sys/firmware/efi/efivars if it exists.
+  SeTconfig: also bind mount /sys/firmware/efi/efivars if it exists.
++--------------------------+
+Thu Feb  1 19:36:54 UTC 2024
+  Don't add elilo boot support to the 32-bit installer image. This had been
+  done previously, but began being siliently dropped when the 32-bit kernel
+  changed from i586 to i686. But it's just as well since UEFI cannot directly
+  boot a 32-bit kernel anyway. Legacy BIOS is the only option.
++--------------------------+
+Wed Jan 31 20:35:22 UTC 2024
+  Added libnvme.
++--------------------------+
+Tue Jan  2 09:03:56 UTC 2024
+  build_installer.sh: Switch /sbin/modinfo from BusyBox's implementation to
+  kmod's, as the busybox implementation doesn't work.
+  Switch /bin/grep to the GNU implementation for a richer feature set.
+  Use the /bin/{e,f}grep shell wrappers, aligned with the OS.
+  /etc/rc.d/rc.S: Call /bin/grep rather than /bin/grep.bin
++--------------------------+
+Mon Dec 11 20:24:00 UTC 2023
+  build_installer.sh: On x86, don't try to use a kernel with an -smp
+  LOCALVERSION as it's no longer built. The regularly-named kernels are now
+  the SMP/i686 versions.
+  repack_installer.SlackBuild: Change x86 $ARCH to i686 and drop -smp
+  LOCALVERSION.
++--------------------------+
+Fri Dec  1 09:49:03 GMT 2023
+  Busybox's version of 'xzcat' creates distinct output compared to the actual
+  'xz' when combined with 'dd' through piping. This issue is fixed by creating
+  a symbolic link from /bin/xzcat to /bin/xz (the 'real' xz).
+  Thanks to Stuart Winter.
++--------------------------+
+Sat Nov 25 17:21:48 UTC 2023
+  Added /usr/libexec/nfsrahead from nfs-utils package to fix error:
+     udevd[452]: failed to execute '/usr/libexec/nfsrahead'
+     '/usr/libexec/nfsrahead 254:0': No such file or directory
+  Thanks to Brent Earl.
++--------------------------+
+Wed Nov  8 21:01:19 UTC 2023
+  Include the original keymaps from the kbd package, as well as the official
+  loadkeys binary and supporting libraries. Some keymaps seem to get broken
+  or mangled from being converted to a binary keymap and loaded with the
+  busybox loadkmap tool.
+  If a keymap is specified on the kernel command line, like: kbd=azerty
+  then after loading it, save the name to /tmp/Pkeymap so that setup knows
+  about it.
+  Construct the list of keymaps on the fly from the /usr/share/kbd/keymaps/i386
+  directory.
++--------------------------+
+Wed Sep 20 08:08:08 UTC 2023
+  Changes for AArch64 architecture:
+  /sbin/probe: Updated reserved file system labels for Hardware Models with
+  UEFI firmware.
+  In 'list_mmc' MMC discovery function, prevent duplication of multi-path
+  devices.
+  /usr/lib/setup/SeTEFI: The Slackware Installer image has its own EFI boot
+  partition named 'SLKins_efi' to support Hardware Models using UEFI firmware.
+  This partition must be filtered out here to avoid it being incorrectly
+  selected as the OS's EFI partition.
+  Thanks to Stuart Winter.
++--------------------------+
+Tue Aug 15 19:15:38 UTC 2023
+  Don't run rc.font unless a kernel command-line flag RCFONT is provided.
+  Legacy BIOS tends to get a correct sized font without it, as does recent
+  UEFI. Running it by default with a HiDPI screen can result in an
+  unreadably small font.
++--------------------------+
+Tue Aug  1 09:09:59 UTC 2023
+  Added /usr/lib(64)/libatomic.so for 'lsusb'
+  Thanks to William PC for the report.
++--------------------------+
+Sun Jul  9 18:25:37 UTC 2023
+  setup: mount /dev, /proc, and /sys with -rbind, and unmount them with -R.
+  mkbindmounts: usr -rbind instead of -bind.
+  reboot: use -R when unmounting /dev, /proc, and /sys.
+  These changes should fix "EFI variables are not supported on this system"
+  when chrooting into /mnt to do additional tasks such as setting up grub.
+  Thanks to downhomechunk.
++--------------------------+
+Sat Jul  1 03:15:09 UTC 2023
+  AArch64:
+  /sbin/probe: Added reserved file system labels for Hardware Models
+  with UEFI firmware:
+  SLKefi = FAT32 file system, /boot/efi mountpoint within the OS.
+  SLKefi_fw = ext4 file system within the Installer image containing UEFI
+  firmware.  The firmware can be offered up for flashing to SPI from
+  within the post installation scripts.
+  Thanks to Stuart Winter.
++--------------------------+
+Fri Jun 30 19:34:16 UTC 2023
+  Make /etc/mtab a symlink to /proc/mounts. (I thought we did this before?)
+  Remove /etc/mounts symlink.
+  In rc.S, don't try to initialize /etc/mtab or fake mount /.
++--------------------------+
+Tue Jun 13 20:02:38 UTC 2023
+  Added liburcu and liburcu-common libraries for xfsprogs.
++--------------------------+
+Thu May 25 00:15:21 UTC 2023
+  Mount efivarfs.
++--------------------------+
+Wed Apr  5 19:09:55 UTC 2023
+  build_installer.sh: Switch /sbin/depmod from BusyBox's implementation to
+  kmod's, as the busybox implementation doesn't work.
+  Get rid of broken /sbin/lspci symlink.
++--------------------------+
+Tue Mar 21 21:05:06 UTC 2023
+  setup: if UEFI is detected, mount efivarfs.
++--------------------------+
+Mon Mar 20 22:18:55 UTC 2023
+  Keep efivarfs kernel module. Thanks to AlleyTrotter.
++--------------------------+
+Wed Mar  1 21:15:12 UTC 2023
+  Add libreiserfscore.so.0.0.0.
++--------------------------+
+Tue Jan 24 20:26:12 UTC 2023
+  build_installer.sh: when compressing the completed installer with xz, use
+  option -vv instead of -v, since the change of default verbosity level seems
+  to have caused just a single -v to be ignored.
++--------------------------+
+Thu Jan 19 20:44:24 UTC 2023
+  build_installer.sh: Switch /bin/dd from BusyBox's implementation to
+  Coreutils', which offers a richer feature set. For example, the command line
+  parameter 'status=progress' provides realtime visibility of critical metrics
+  (transfer speed, ETA, % complete). This helps when working with the storage,
+  where the installer is used as an preparation and test environment.
+  Thanks to Stuart Winter.
+  Added "bricktick", an ncurses based game (why not, it's only 31K)
++--------------------------+
+Wed Jan 18 20:30:13 UTC 2023
+  /usr/lib/setup/INS-all-in-one:  Added.
+  This detects the AiO (All in One Offline) partition labeled 'SLKins_aio-pkgs'
+  that houses the Slackware source media (installable packages), and configures
+  the Installer to use it as the media source.
+  /usr/lib/setup/SeTmedia:  Call INS-all-in-one first to discover the A-i-O media
+  partition.  If unavailable, fails sanity check or the user opted not to use
+  the included media, the regular set of source media selection options are
+  presented.
+  /usr/lib/setup/setup:  Post install: If the A-i-O partition is mounted, umount
+  and suggest to physically unplug the Slackware Installer USB stick.
+  This is skipped on ARM since the A-i-O partition resides on the same storage
+  as the OS' /boot partition, so cannot/should not be removed.
+  Fixed white space in license header.
+  /usr/lib/setup/SeTpasswd:  Clear screen before setting 'root' user password to
+  fix a text overlap from the 'dialog' box when installing over SSH.
+  Thanks to Stuart Winter.
++--------------------------+
+Tue Jan 17 20:55:17 UTC 2023
+  pxesetup: after sorting the partition list, run it through 'uniq' to ensure
+  no duplicates are listed. Thanks to 'opty' in Libera.Chat ##slackware.
++--------------------------+
+Mon Jan  9 09:37:40 UTC 2023
+  /sbin/probe: Removed old mmc discovery code.
+  Filter devices that contain reserved file system labels for Slackware
+  ARM/AArch64 and the A-i-O (All in One Offline) Installer.
+  This prevents the installation media and Slackware ARM system partitions from
+  appearing as candidates for formatting/mounting during setup.
+  Reserved labels:
+   SLKins = Media (usually a USB stick) containing the Slackware install media.
+   SLKboot = Slackware OS /boot partition; only reserved only on ARM/AArch64.
+   SLKhwm_bw = Hardware Model Bootware - native Bootware firmware/assets.
+   SLKins_aio-pkgs = A-i-O Installer's partition containing Slackware packages.
+  Thanks to Stuart Winter.
++--------------------------+
+Thu Oct 13 12:29:18 UTC 2022
+  Moved libpcre2 from /usr/lib(64) to /lib(64). Thanks to Stuart Winter.
++--------------------------+
+Mon Sep 26 14:43:44 UTC 2022
+  /sbin/probe: Fix duplicated enumeration of mmc storage devices (e.g. SD cards).
+  Thanks to gsl on LQ for the report.
++--------------------------+
+Mon Sep 12 18:09:41 UTC 2022
+  Removed pcre, added pcre2. Needed for GNU grep.
+  Thanks to EdGr.
++--------------------------+
+Tue Sep  6 18:34:42 UTC 2022
+  rc.pcmcia: change fgrep to grep -F.
+  /sbin/probe: change egrep to grep -E.
++--------------------------+
+Fri Aug 19 08:08:08 UTC 2022
+  /etc/rc.d/rc.S:  Added support for setting the Installer's root password
+  from a Kernel cmdline key value pair, instrootpw=yourpassword
+  This is intended for network installations where otherwise the root password
+  would be unset.
+  Note: this does not configure the OS root password.
+  Passwords should be set as follows within the Kernel cmdline:
+    instrootpw=yourpassword
+  MoZes.
++--------------------------+
+Wed Jun 29 19:13:25 UTC 2022
+  Added smartctl, smartctl.8, and dmidecode.8.
++--------------------------+
+Tue Jun 14 08:08:08 UTC 2022
+  Added liblz4 for fsck.f2fs.  Thanks to Brent Earl.
++--------------------------+
+Mon Feb  7 19:03:07 UTC 2022
+  Add a /usr/bin/dbclient symlink. Thanks to alienBOB.
++--------------------------+
+Sat Feb  5 23:02:19 UTC 2022
+  Build a simplified version of dnsmasq that doesn't require libraries not
+  found on the installer. Unfortunately this bug broke PXE installation.
+  If you require PXE support for your installs, use this installer instead.
+  It will work on Slackware 15.0 as well.
+  Not entirely sure if this merits respinning the ISOs for 15.0... feel free
+  to make a thread on LQ and weigh in with any comments.
++--------------------------+
+Sat Jan 22 21:34:07 UTC 2022
+  Reverted to an older simpler version of rescan-scsi-bus that does what we
+  need it to on the installer. Apparently the one we upgraded to requires the
+  real version of "find" and has additional requirements resulting in it being
+  broken for almost a year. Since nobody noticed until now, I wonder to what
+  extent this functionality is still important on modern hardware, but we'll
+  fix it anyway just in case. Thanks to almope.
+  Added sg.ko kernel module (rescan-scsi-bus has always wanted this but never
+  previously got it, so we'll add it and hope it helps).
++--------------------------+
+Tue Jan 18 11:42:59 UTC 2022
+  /usr/lib/setup/setup: If a Slackware USB stick was used as the package
+  source, prompt user to unplug the USB stick when the installation
+  completes.
+  /usr/lib/setup/INSUSB: Fix a cosmetic bug if the USB stick has no partitions.
+  MoZes.
++--------------------------+
+Sun Jan 16 20:51:35 UTC 2022
+  Fix installation of the exfat kernel module(s).
+  Thanks to Nille_kungen.
++--------------------------+
+Wed Jan 12 19:45:11 UTC 2022
+  Added "nvme" command-line utility. Thanks to peake.
++--------------------------+
+Wed Dec 15 04:07:42 UTC 2021
+  /sbin/probe:  Discover MMC storage devices using lsblk.
+  Thanks to Stuart Winter.
++--------------------------+
+Sun Nov  7 06:11:40 UTC 2021
+  usr/lib/setup/setup:  Added 'power off' to the list of available options
+  ('reboot' and 'shell'), when the installer completes successfully.
++--------------------------+
+Wed Nov  3 19:36:08 UTC 2021
+  Added ntfs3.ko.xz module.
+  SeTDOS: use FS type ntfs3 for NTFS partitions in /etc/fstab.
++--------------------------+
+Mon Oct 11 17:33:21 UTC 2021
+  /etc/issue: Don't tell people to enter TERM=vt100 if they do not have a
+  color monitor. That's so last century.
+  Thanks to Stuart Winter.
++--------------------------+
+Wed Oct  6 12:16:57 UTC 2021
+  build_installer.sh:  Added console font 'ter-732b.psf.gz'
+  for the AArch64/PineBook Pro.
+  Thanks to Stuart Winter.
++--------------------------+
+Fri Sep  3 18:06:38 UTC 2021
+  Added dhcpcd user/group to passwd/group/shadow.
+  Added /var/lib/dhcpcd directory.
+  Thanks to Stuart Winter.
++--------------------------+
+Wed May 26 19:51:53 UTC 2021
+  Keep PCI controller kernel modules. Thanks to andygoth.
++--------------------------+
+Fri Apr 30 17:30:36 UTC 2021
+  setup: filter partition list through sort | uniq to prevent duplicates.
+  Thanks to Heinz Wiesinger.
++--------------------------+
+Thu Apr 22 16:56:28 UTC 2021
+  setup: fix running ldconfig. Thanks to alienBOB and MoZes.
++--------------------------+
+Tue Apr 20 18:46:38 UTC 2021
+  setup: run ldconfig after the packages are installed.
+  Thanks to average_user.
++--------------------------+
+Sat Apr 10 18:46:46 UTC 2021
+  setup: update size estimate of a complete installation to 15+ GB.
++--------------------------+
+Tue Mar  9 19:09:33 UTC 2021
+  Update /etc/nsswitch.conf from the etc package.
++--------------------------+
+Thu Mar  4 09:17:54 UTC 2021
+  build_installer.sh:  Updated support for AArch64.
+  MoZes.
++--------------------------+
+Sat Feb 20 20:40:32 UTC 2021
+  Updated /sbin/rescan-scsi-bus to fix a misplaced "break". Thanks to andygoth.
++--------------------------+
+Sun Feb 14 19:39:31 UTC 2021
+  Might as well add libINIReader since we have libinih already.
++--------------------------+
+Thu Feb 11 21:11:56 UTC 2021
+  Added getcap/setcap.
++--------------------------+
+Fri Feb  5 20:56:27 UTC 2021
+  Patched for aaa_glibc-solibs rename.
++--------------------------+
+Mon Feb  1 18:59:32 UTC 2021
+  Add upgradepkg to the installer image.
++--------------------------+
+Sun Jan 17 20:08:17 UTC 2021
+  Upgrade to busybox-1.32.1.
++--------------------------+
+Sat Jan  9 19:43:33 UTC 2021
+  Add libzstd.so.1, needed by kmod.
++--------------------------+
+Thu Dec 31 20:35:53 UTC 2020
+  Add libelogind.so.0, needed by libprocps.so.8.
++--------------------------+
+Thu Dec 17 20:19:08 UTC 2020
+  Add libinih, needed by xfsprogs.
++--------------------------+
+Tue Dec 15 19:24:23 UTC 2020
+  Update dropbear to get ecdsa support. Thanks to Robby Workman.
++--------------------------+
+Tue Dec  8 19:22:18 UTC 2020
+  SeTPKG: Change KDE blurb to say "The KDE Plasma Desktop"
++--------------------------+
+Fri Oct 30 22:06:27 UTC 2020
+  Add libnsl. Thanks to Olek.
++--------------------------+
+Thu Oct 29 21:50:02 UTC 2020
+  Don't build the inetd busybox applet.
++--------------------------+
+Thu Aug 20 05:22:35 UTC 2020
+  Include /usr/bin/env.
++--------------------------+
+Sun Jul 26 18:30:17 UTC 2020
+  Add neofetch. Seems like a useful system information tool to have in the
+  installer, and it's small enough.
+  Note that without /etc/os-release, this gives a generic Tux logo instead of
+  the Slackware logo, but that also keeps the system information from getting
+  clipped if the terminal is 80 columns.
++--------------------------+
+Fri Jul 10 00:21:42 UTC 2020
+  Add speakup modules to the installer image. We'll hopefully figure out how to
+  better handle these in the future.
++--------------------------+
+Sun Jun  7 23:24:18 UTC 2020
+  Fix NTFS partition detection, and add support for exFAT.
++--------------------------+
+Sun May 17 19:57:48 UTC 2020
+  Added PAM libraries, security modules, and config files.
++--------------------------+
+Tue Mar 31 18:02:13 UTC 2020
+  In series selection menu, don't (falsely) mention Qt being in the KDE series.
++--------------------------+
+Sat Feb 29 06:17:27 UTC 2020
+  Added kernel modules:
+  dm-bufio, dm-bio-prison, dm-persistent-data, dm-snapshot, dm-thin-pool.
+  Don't include dm-snapshot in module-blacklist.
+  These changes prompted by the suggestion to include dm-thin-pool.ko in the
+  installer by jr_bob_dobbs.
++--------------------------+
+Sat Feb  1 22:31:14 UTC 2020
+  Compress kernel modules in parallel.
+  Install packages with --terse mode.
+  Touch /etc/shells to prevent harmless but ugly build-time error.
++--------------------------+
+Fri Jan 31 20:25:54 UTC 2020
+  Added zerofree and sparsify binaries and zerofree manpage.
++--------------------------+
+Mon Jan 27 00:09:05 UTC 2020
+  Added libkeyutils.so.1, needed by the krb5 libraries.
+  Thanks to dodoLQ.
+  Added nano editor. See build script for additional options ;-)
+  Thanks to Didier Spaier.
+  Fix ldd shebang.
++--------------------------+
+Fri Jan 24 00:35:26 UTC 2020
+  Added libraries: libgssapi_krb5, libk5crypto, libkrb5, libkrb5support.
++--------------------------+
+Sun Jan 12 20:36:57 UTC 2020
+  /sbin/reboot: Attempt to kill running processes and sync/umount/sync
+  filesystems before rebooting. Thanks to Jeebizz.
++--------------------------+
+Mon Dec 30 20:05:46 UTC 2019
+  SeTEFI: Patched to remove extra whitespace from lsblk output.
+  Thanks to Didier Spaier.
++--------------------------+
+Sat Dec  7 02:24:58 UTC 2019
+  sources/initrd/skeleton_initrd.tar.gz:
+  /sbin/probe: adjust to newer "cryptsetup status" output. This fixes all LVM
+  volumes being listed twice.
++--------------------------+
+Fri Dec  6 20:16:45 UTC 2019
+  repack_installer.SlackBuild:  Added.
+    This repacks the installer from the tree found under
+    $TMP/build-slackware-installer, allowing changes to be made and tested.
+  build_installer.sh:  Trivial typo fix - add a space in a comment.
++--------------------------+
+Sat Nov 30 21:01:01 UTC 2019
+  Use $NUMJOBS with busybox make install.
++--------------------------+
+Wed Aug 21 18:57:50 UTC 2019
+  Properly install libcryptsetup since it has moved under /usr.
+  Thanks to formalist for the bug report.
++--------------------------+
+Mon Aug  5 07:05:18 UTC 2019
+  Don't use -s (--stupid) when installing syslinux. This loads much faster and
+  _probably_ won't increase the probability of boot failure. But, if it fails
+  let me know.
++--------------------------+
+Mon Jul 29 21:51:59 UTC 2019
+  Include libraries from the argon2 and json-c packages, needed by cryptsetup.
++--------------------------+
+Fri Jul 12 18:42:02 UTC 2019
+  build-installer.sh: Add cqhci.ko kernel module.
+  Thanks to Pomme Raccoon.
++--------------------------+
+Wed Jul 10 22:33:27 UTC 2019
+  /sbin/reboot: shell script to call the real reboot with "reboot -f" to
+  prevent a reboot hang after installation.
++--------------------------+
+Sat Apr 27 19:53:20 UTC 2019
+  build_installer.sh: remove final dangling symlink check. This gets into
+  a filesystem loop that takes a bit of time, and has never turned up any
+  dangling symlinks that actually need attention.
++--------------------------+
+Sun Mar  3 19:17:45 UTC 2019
+  Update busybox to 1.30.1.
++--------------------------+
+Sat Jan 26 19:58:30 UTC 2019
+  Fixed detecting FAT/NTFS partitions on UEFI systems.
++--------------------------+
+Fri Jan 25 23:06:42 UTC 2019
+  Updated the elilo bootloaders in /EFI/BOOT which were older versions
+  (possibly with the 8MB kernel size limit?)
++--------------------------+
+Thu Jan 24 20:01:25 UTC 2019
+  SeTEFI: If the kernel doesn't detect efi, bail.
+  SeTEFI: Detect EFI partition using lsblk. Thanks to Didier Spaier.
++--------------------------+
+Tue Jan 22 22:42:47 UTC 2019
+  Before running the CONFIGURE section, create bind mounts to /dev, /proc, and
+  /sys. This is useful for chrooting and setting up boot loaders.
+  Also add "mkbindmounts" command to do this manually for anything that's
+  mounted on /mnt. This avoids having to type these commands when using the
+  installer for system rescue purposes.
++--------------------------+
+Sun Jan  6 19:54:10 UTC 2019
+  Account for .x64 suffix on /boot/config-* files with x86_64 when installing
+  the config files and /boot/config symlink. Thanks to Edward Grattan.
++--------------------------+
+Wed Nov 28 05:31:04 UTC 2018
+  Activate LVM volumes at boot, not only when setup is run.
+  Make /etc/mtab a symlink to /proc/mounts on the installer.
+  On a freshly installed system, make /etc/mtab a symlink to /proc/mounts.
+  Include f2fs-tools on the installer.
+  Support installing on F2FS partitions.
++--------------------------+
+Wed Oct 10 22:41:29 UTC 2018
+  Added Hyper-V keyboard and framebuffer modules.
++--------------------------+
+Thu Sep 13 19:42:20 UTC 2018
+  Load ter-114v.psf.gz in rc.font.
++--------------------------+
+Mon Sep 10 20:41:59 UTC 2018
+  Switch to ter-114v.psf.gz as the consolefont. It has been reported that the
+  font we were using (ter-v14v.psf.gz) restricts the available console colors
+  from 16 to 8 due to needing an extra bit for the higher number of available
+  glyphs (though in testing here I couldn't see any difference). The new font
+  covers ISO8859-1, ISO8859-15, and Windows-1252 codepages. I'm still not sure
+  it's the best choice, so additional input is welcomed.
++--------------------------+
+Wed Jul 25 03:29:26 UTC 2018
+  Use ter-v14v.psf.gz as the consolefont. It supports more character sets, and
+  the larger font was causing wraparound on UEFI (at least on bare metal here).
++--------------------------+
+Fri Jun 22 23:38:50 UTC 2018
+  Added libaio (needed by lvm).
++--------------------------+
+Wed Jun 20 21:08:45 UTC 2018
+  Upgraded dropbear. Thanks to Robby Workman.
++--------------------------+
+Mon Jun 18 17:53:56 UTC 2018
+  When compressing the initrd with xz, add: -C crc32 
+  Use xzcat instead of zcat in a few places where the build script wants to
+  extract a previous initrd.
++--------------------------+
+Mon Jun 18 04:13:53 UTC 2018
+  Copy libefiboot to the installer (needed by efibootmgr).
+  Compress the kernel modules with xz.
+  Compress the initrd image with xz.
++--------------------------+
+Thu Jun 14 01:16:42 UTC 2018
+  Copy libefivar to the installer (needed by efibootmgr).
++--------------------------+
+Wed Jun  6 20:31:26 UTC 2018
+  Fix finding some DOS/Win partition types. Thanks to Stuart Winter.
+  Wipe the probe md5sum to force rescanning partitions if setup is restarted.
++--------------------------+
+Sat Apr 28 20:04:23 UTC 2018
+  Reduce sleep times in the installer. You'll just have to read faster. ;-)
++--------------------------+
+Sat Apr 21 00:29:54 UTC 2018
+  Use busybox's dd after all... it wasn't the cause of the size display bug.
+  Don't try to migrate /tmp storage to the hard drive. We're not in the
+  floppy disk era any more and are unlikely to run out of space on a tmpfs.
++--------------------------+
+Wed Apr 18 04:06:45 UTC 2018
+  Update busybox to 1.28.3.
+  Add dd and mcookie to the installer.
+  Add a dialog when setup starts to tell the user that partition information
+  is being collected.
++--------------------------+
+Sat Mar 31 18:00:31 UTC 2018
+  sources/initrd/skeleton_initrd.tar.gz:
+    /sbin/probe: use md5sum of /proc/partitions to determine if previously
+    cached results should be returned.
++--------------------------+
+Thu Mar 22 09:51:59 UTC 2018
+  Fixes for ARM:
+  * Fix module loading from etc/rc.d/rc.S
+  * Update architecture quadlet for build target
++--------------------------+
+Thu Mar  1 21:56:38 UTC 2018
+  Put up "Scanning for USB stick..." dialog during the scan delay.
+  Make "terse" the pre-selected menu mode.
++--------------------------+
+Thu Mar  1 06:55:30 UTC 2018
+  /sbin/probe: Add -c option to use the cached previous results if possible.
+  Use cached probe where possible in /usr/lib/setup scripts.
+  In many places, remove double spaces from after sentences in accordance with
+  the Chicago Manual of Style recommendations.
++--------------------------+
+Mon Feb 19 22:30:33 UTC 2018
+  Add packages: lzip, lzlib, plzip.
++--------------------------+
+Tue Feb 13 06:43:38 UTC 2018
+  Put files in the same places that they would be on a real install, instead
+  of shoving everything into /bin. Remove busybox symlinks if we have a real
+  version to use instead.
+  Don't copy /bin/tar-[0-9]* to the installer. /bin/tar is good enough
+  (check it with --version ;-), and the pkgtools no longer use tar-1.13.
+  Don't sed the ldd shebang, no need now that we have a /usr/bin/bash symlink.
+  Make sure that /bin/sh points to bash, but don't mess with other shell links.
+  Copy /usr/bin/ddrescue from the package to the installer.
++--------------------------+
+Sun Feb  4 04:24:08 UTC 2018
+  Create /etc/default directory.
+  Include /etc/default/{nfs,rpc}
++--------------------------+
+Wed Nov 22 18:34:44 UTC 2017
+  Update to the newer elilo.x64 binary in sources/efi*
++--------------------------+
+Wed Nov 22 04:49:08 UTC 2017
+  SeTEFI: Don't use fdisk -l (unneccessary). Thanks to Didier Spaier.
+  SetEFI: Scan /dev/mmcblk[0-9]. Thanks to zerouno.
+  probe: Filter another possible EFI partition label.
++--------------------------+
+Sun Nov 12 22:08:51 UTC 2017
+  Include iproute2 and hostname packages (to get hostname and ip man pages).
++--------------------------+
+Mon Oct  2 17:35:19 UTC 2017
+  slackinstall: When doing a network install, don't download a package if the
+  tagfile is going to skip installing it. Thanks to ivandi.
++--------------------------+
+Sat Sep 30 21:06:10 UTC 2017
+  SeTnet attempts to cat $TMP/SeTT_PX at boot time, when it doesn't exist.
+  I just directed stderr from these attempts to /dev/null to get rid of the
+  error message, but perhaps there's a bug here that needs to be addressed?
+  SeTnet doesn't actually seem to use $T_PX for anything other than determining
+  if it's running on the installer or an installed system.
++--------------------------+
+Fri Jul 28 17:09:07 UTC 2017
+  Upgraded to busybox-1.27.1, and enabled damn near everything. Might as well,
+  since the size of e.g. kernel modules will dwarf the busybox binary anyway,
+  and any real utilities we use will be copied over the symlinks after busybox
+  is built.
+  Removed /usr/bin/man shell script -- use busybox man applet instead.
+  Create /usr/bin/man? -> cat? symlinks to make busybox man happy with the
+  preprocessed manpages.
++--------------------------+
+Mon Jul 17 18:47:36 UTC 2017
+  In busybox-dot-config, add support for findfs and volume ids.
++--------------------------+
+Fri Jul  7 18:53:31 UTC 2017
+  Dnsmasq has changed to using libidn2, so add the libidn2 library and the
+  libunistring library to the installer. Don't add libidn version 1 anymore,
+  as nothing else on the installer uses it.
++--------------------------+
+Tue May  9 20:22:15 UTC 2017
+  Replace hardcoded /mnt with ${T_PX} in many places.
+  Thanks to alienBOB.
++--------------------------+
+Tue May  9 18:43:55 UTC 2017
+  Use nosuid,nodev,noexec mount options for /dev/shm in installer-created
+  /etc/fstab.
++--------------------------+
+Thu May  4 21:31:35 UTC 2017
+  Patched SeTEFI and probe to fix NVMe support.
+  Thanks to Didier Spaier.
++--------------------------+
+Thu Feb 23 19:00:56 UTC 2017
+  sources/initrd/skeleton_initrd.tar.gz:
+    /sbin/probe, line 156:  filter output through strings to avoid bash warning
+    about NUL bytes in input.
++--------------------------+
+Mon Jan  2 23:34:36 UTC 2017
+  build_installer:  Use the 'bash' package rather than compiling it.
+     Removed some old ARM cruft.
+     Added some basic 'aarch64' (arm64) support.
++--------------------------+
+Sat Dec 24 00:53:47 UTC 2016
+  build_installer: Do not include libtermcap.
+  Also, I'd rather see this use the bash package than compile bash, just to
+  save a bit of compile time.  There's currently no reason to be compiling
+  this, and the given reason is "in case we might need diet configure flags
+  sometime in the future".  YAGNI.
++--------------------------+
+Tue Jul 12 17:25:10 UTC 2016
+  build_installer: Switched soft->hard float CFLAGS.
+		   Removed trailing white space.
++--------------------------+
+Tue Jun  7 10:36:58 UTC 2016
+  build_installer: Added /etc/nfsmount.conf so that any default changes
+                   made to the nfs-utils package exist within the installer.
+                   Moved some of the file copying script around.
+  sources/initrd/skeleton_initrd.tar.gz:
+     Removed etc/nfsmount.conf, etc/dialogrc (was already copied by the
+     build_installer script).
+  MoZes.
++--------------------------+
+Fri May 27 19:45:28 UTC 2016
+  Forgot to make rc.dropbear executable, AAAAAARGH
++--------------------------+
+Wed May 25 23:08:19 UTC 2016
+  In rc.dropbear, don't tell it to use motd.net, which no longer exists.
++--------------------------+
+Fri May 20 17:10:54 UTC 2016
+  Include /sbin/e4crypt.
++--------------------------+
+Wed May 11 23:43:13 UTC 2016
+  In rc.S, comment out making motd.net telling the user to source /etc/profile.
+  Dropbear handles things properly without that now.
++--------------------------+
+Tue May  3 19:53:33 UTC 2016
+  Include md/dm-raid.ko module for LVM with internal RAID support.
++--------------------------+
+Sun Apr 24 00:27:03 UTC 2016
+  Patched busybox to fix newly created directory perms on 64-bit platforms.
++--------------------------+
+Sat Mar 19 21:27:44 UTC 2016
+  Increase "full install" size estimate to 9+ GB.
++--------------------------+
+Sat Mar 19 19:01:06 UTC 2016
+  Add libpci.so.* to the installer, since lspci needs that now.
++--------------------------+
+Sat Mar  5 18:12:03 UTC 2016
+  Use "mkfs.brtfs -f" in SeTpartitions.  Thanks to Didier Spaier.
++--------------------------+
+Wed Mar  2 20:01:32 UTC 2016
+  Patch /sbin/probe (again) to hopefully fix NVMe devices on Dell laptops.
++--------------------------+
+Sat Feb 20 17:50:37 UTC 2016
+  Set empty password for root in /etc/shadow so that root can log in using
+  dropbear.  Thanks to MoZes.
++--------------------------+
+Wed Feb  3 00:13:29 UTC 2016
+  Include all cpufreq modules.
+  Keep acpi/processor.ko, needed by acpi-cpufreq.
+  Use 'LANG=C fdisk -l' in SeTEFI.
++--------------------------+
+Wed Jan 13 19:15:03 UTC 2016
+  Fixed this line in /sbin/probe:
+    elif [ "$MAJOR" = "259" ]; then
++--------------------------+
+#NOT ACTUALLY MERGED SINCE IT DOESN'T WORK
+#Tue Jan 12 07:26:02 UTC 2016
+#  Use tar to extract the kernel module directory version number from the
+#  kernel-modules package.  This is needed for a kernel such as 4.4 which
+#  installs modules in /lib/modules/4.4.0/.
++--------------------------+
+Thu Dec 24 20:35:26 UTC 2015
+  Patched /sbin/probe for nvme partitions.
+  Thanks to Didier Spaier.
++--------------------------+
+Wed Dec 23 04:09:29 UTC 2015
+  Added kernel modules:  block/nvme.ko, mmc/host/sdhci-acpi.ko.
++--------------------------+
+Mon Dec 21 08:40:29 UTC 2015
+Updates for auto NFS mounting:
+sources/initrd/skeleton_initrd.tar.gz:
+  usr/lib/setup/INSNFS: Use '/etc/rc.d/rc.rpc restart' rather than starting
+  rpcbind and rpc.statd directly.
+  etc/services: Removed.  Now added by the build_installer.sh script.
+build_installer.sh:
+  Add /etc/rc.d/rc.rpc to the installer image and chmod +x.
+  Add /usr/sbin/sm-notify from nfs-utils package.
+  Copy /etc/services from the 'a/etc' package to ensure that it's always up to date.
+  Copy /etc/netconfig from the libtirpc package (required for rpc.statd/rpcbind).
+  MoZes.
++--------------------------+
+Tue Dec 15 21:04:25 UTC 2015
+  Remove portmap from package list, add libtirpc and rpcbind.
+  Patch INSNFS to run rpcbind instead of rpc.portmap.
++--------------------------+
+Tue Dec  1 22:28:10 UTC 2015
+  In /etc/motd, don't suggest gdisk and cgdisk for partitioning GPT, since
+  fdisk and cfdisk work just fine now.  Also, remove instructions for starting
+  PCMCIA and Cardbus devices.  I doubt many people are still using that.
++--------------------------+
+Wed Nov 25 05:17:36 UTC 2015
+  Add /dev/shm and /dev/pts to /etc/fstab.
++--------------------------+
+Wed Nov 25 02:34:25 UTC 2015
+  Change 32-bit x86 $ARCH to i586.
++--------------------------+
+Tue Nov 24 21:54:15 UTC 2015
+  Added /bin/numfmt to use for converting bytes into K, M, T, or even P.
+  Used in the installer itself and in pkgtools.
++--------------------------+
+Thu Nov 19 18:02:48 UTC 2015
+  Replace udev with eudev/libgudev.
++--------------------------+
+Wed Nov 18 23:25:57 UTC 2015
+  Also support T (although it's not like I wasn't already)
++--------------------------+
+Wed Nov 18 22:04:08 UTC 2015
+  Correct partition sizes, and use K, M, or G.
+  Use -F -F for all mkfs.ext* (shut up and do what I say mode)
++--------------------------+
+Sat Nov 14 18:54:26 UTC 2015
+  Add hwdata package to get pci.ids and usb.ids.
++--------------------------+
+Tue Nov  3 19:40:22 UTC 2015
+  Added libpcre.so.1, needed by the new grep.
++--------------------------+
+Thu Oct 29 19:42:58 GMT 2015
+  No longer build dhcpcd version 3, use the dhcpcd package from the 'n'
+  series.
+  Removed some superfluous white space.  Still more to do ;-)
++--------------------------+
+Thu Aug 27 19:55:26 UTC 2015
+  Patched build-installer.sh to allow for non-numeric $VERSION in packages.
+  Thanks to MoZes.
++--------------------------+
+Thu Aug  6 23:42:10 UTC 2015
+  sed s/procps/procps-ng/g in build-installer.sh.
++--------------------------+
+Mon May 25 09:47:32 UTC 2015
+Merged fixes from MoZes:
+
+sources/initrd/skeleton_initrd.tar.gz:
+1) etc/profile:
+   The code to parse TERM= from /proc/cmdline only worked properly if TERM=
+   was at a particular position in the string.
+   This is for handling installations on ARM using the serial console and 'screen':
+--- etc/profile.orig   2013-12-03 09:04:26.000000000 +0000
++++ etc/profile    2015-05-25 09:44:02.078325859 +0100
+@@ -7,8 +7,8 @@
+
+ # Allow a user to set the default TERM entry by specifying TERM=<name>
+ # as a kernel command line parameter:
+-if cat /proc/cmdline | grep TERM= 1> /dev/null 2> /dev/null ; then
+-   export $( sed -n -e "s/.*\(TERM=.*\ \).*/\1/p" < /proc/cmdline )
++if cat /proc/cmdline | grep "TERM=[a-zA-Z0-9]" 1> /dev/null 2> /dev/null ; then
++   export TERM=$( sed 's/.*TERM=\([^ ]*\).*/\1/' < /proc/cmdline )
+ elif cat /proc/cmdline | grep console=ttyS 1> /dev/null 2> /dev/null ; then
+
+2) etc/rc.d/rc.inet1
+10 seconds timeout is too little on the SheevaPlug and I've also seen a report
+on LQ about the same issue on x86_64 -- I suppose it depends on the network driver
+or the NIC itself.
+I needed at _least_ 30 seconds for the SheevaPlug to get an IP, and about 12 seconds
+for the Banana Pi.
+--- etc/rc.d/rc.inet1.orig        2011-04-15 13:48:22.000000000 +0100
++++ etc/rc.d/rc.inet1 2015-05-25 10:01:19.357259132 +0100
+@@ -22,7 +22,7 @@
+    if grep -q $(echo ${EDEV}: | cut -f 1 -d :): /proc/net/wireless ; then
+      continue # skip wireless interfaces
+    fi
+-   /sbin/dhcpcd -t 10 -L -T $EDEV 1>/etc/dhcpc/dhcpcd-${EDEV}.info 2>/dev/null &
++   /sbin/dhcpcd -t 35 -L -T $EDEV 1>/etc/dhcpc/dhcpcd-${EDEV}.info 2>/dev/null &
+   done
+ fi
+
+/build_installer.sh: (ARM only):
+  Set the system clock from the RTC prior to fudging the date because on some
+  devices the system clock is not set when the RTC module loads.
++--------------------------+
+Mon May  4 04:13:36 UTC 2015
+In rc.S, move fakedate hack so that udev runs first.
++--------------------------+
+Wed Apr 29 18:56:54 UTC 2015
+Merged updates from MoZes:
+build_installer.sh: Enable setting the terminal window title even through
+'screen'.
+Fri Feb 20 19:18:22 UTC 2015
+Fetch libfdisk and libsmartcols from /lib, not /usr/lib.
+The location was changed since there are binaries outside of /usr
+that link to these.
++--------------------------+
+Fri Feb 20 01:19:54 UTC 2015
+Updated /sbin/probe to work with the new util-linux fdisk.
+Updated SeTEFI to work with the new util-linux fdisk.
++--------------------------+
+Fri Feb 13 22:27:44 UTC 2015
+Fix calls to setterm that reset the foreground/background to set the desired
+colors rather than use "default" since it appears the util-linux people broke
+that, too.
++--------------------------+
+Fri Feb 13 20:41:50 UTC 2015
+Updates to rc.S in the skeleton_initrd.tar.gz to fix issues with the new
+util-linux update.  Also, use -F with mke2fs, otherwise it'll hang if the
+partition was previously formatted.
++--------------------------+
+Wed Feb 11 01:10:20 UTC 2015
+Add libsmartcols fom the new util-linux.
++--------------------------+
+Sun Feb  8 14:40:19 GMT 2015
+Merged updates from MoZes:
+build_installer.sh: Added rtl_nic to the list of firmwares to include.
+This firmware is added to the ARM 'a/kernel-firmware' package so will not be present
+on x86.
++--------------------------+
+Sun Nov 16 19:12:13 UTC 2014
+Applied fixes from MoZes:
+1) bash patch #12 is UTF8 so it was not caught by the grep, so anything past patch 11
+   was never applied.  Fixed to match file types of 'ASCII' and 'text'.
+2) ARM does not have syslinux, so we don't want to exit the Installer build because of this.
+   Only try and move the syslinux-nomtools binary if we're running on an *86* platform.
++--------------------------+
+Tue Sep  9 03:31:31 UTC 2014
+Use syslinux-nomtools on the installer.  Thanks to Didier Spaier.
++--------------------------+
+Wed Jul 23 22:08:21 UTC 2014
+Fix SeTDOS script to show the partition device properly when setting the
+security level.  Thanks to luvr on LQ.
++--------------------------+
+Fri Apr 18 11:13:15 BST 2014
+All of these changes have been tested on ARM and x86.
+
+1. build_installer.sh
+
+  Include both versions of tar from the a/tar-*.t?z package:
+
+  Many users use the installer as a rescue system and tar-1.13 has issues with
+  files with long file names:
+  http://www.linuxquestions.org/questions/slackware-14/%5Bto-devs%5D-slackware-install-iso-tar-version-tooo-old-4175497116/
+ 
+  The pkgtools inside the installer call tar-1.13 directly.  All other
+  scripts that call tar (font setting) work properly with tar-1.26.
+
+2. installer/sources/initrd/skeleton_initrd.tar.gz
+
+All of these changes are baked into the new version of the archive.
+
+Summary:-
+
+etc/inittab:  
+  Upon shutdown of the installer, kill dropbear to prevent installations
+  performed over SSH from hanging until the SSH client times out.
+
+usr/lib/setup/setup:
+  Move from x86-centric man-at-keyboard method of finalising the
+  installation.  Offer 'reboot' or 'shell' from a dialog prompt - helpful
+  for systems that were remotely installed.
+  Switch single line of text instruction to remove CD with a dialog box.
++--------------------------+
+Sat Feb 15 22:26:01 UTC 2014
+Merged updates from MoZes:
+build_installer.diff
+   Changelog:
+  Add 's' and 'x' termcaps so the installation looks pretty when
+  installed over serial console using 'screen' as a terminal emulator.
+  ARM: Switch the 'versatile' kernel name to 'armv7'.
+       Drop an ancient serial console bug fix.
+
+skeleton_initrd.tar.gz:
+  Modified etc/profile:
+    to allow user to set TERM= as a kernel paramater, so as to set $TERM up front.
+    The previous logic was that when console=ttyS was found, the TERM defaulted to vt100
+    which was unfortunate because the ARM devices are usually always booted from a serial
+    console with that kernel parameter, but are controlled from a fully functional
+    Linux terminal emulator.
+
+  Modified etc/rc.S
+    Move the keyboard selector to after the profile scripts have been executed, so
+    the user can set a useful TERM value that works properly with dialog.
+
+ Modified: usr/lib/setup/SeTnet
+    Added 'clear' after dialog finishes, to avoid a messy screen on the serial port
+    (for example, after eth0 is initialised with DHCP, drop bear starts and splatters
+     its key generation over the blue background, looking badly integrated).
++--------------------------+
+Fri Nov  1 01:02:38 UTC 2013
+Mute the LVM scan at the end of package installation.
++--------------------------+
+Sun Oct 27 21:53:15 UTC 2013
+Filter "partitions" found on a USB installer stick in SeTDOS so that
+they don't appear in the menu.
++--------------------------+
+Sun Oct 13 23:49:24 UTC 2013
+Rework /sbin/probe to use gdisk instead of parted, as parted does not
+display the partition type code.  This allows detecting swap space
+without first running mkswap on it, and prevents unknown partition types
+from showing up as Linux partitions.
+Added SeTEFI script, which will set up an EFI System Partition.
+A partition found on the same device as the root Linux partition will be
+preferred, but otherwise any EFI partition found on /dev/sd{a,b,c...}
+will be used.
+Add /bin/pr, needed by rescan-scsi-bus.sh.
++--------------------------+
+Wed Sep 25 05:12:29 UTC 2013
+Add support for installing the packages from a USB stick.
+This will require changing usbimg2disk to not modify the initrd.
++--------------------------+
+Thu Sep 12 07:19:29 UTC 2013
+Add freq_table.ko if KMS is requested in the build.
++--------------------------+
+Sat Sep  7 21:08:24 UTC 2013
+Don't install pt_chown.  It's been removed from glibc-2.18 as a possible
+security hole, and is patched out of the glibc-2.17 in -current.
++--------------------------+
+Thu Sep  5 22:23:36 UTC 2013
+Added os-prober package, since liloconfig is going to use that to find
+Windows partitions (avoiding the issue of a USB installer stick being
+detected as a Window installation).
++--------------------------+
+Fri Aug 16 20:25:48 UTC 2013
+Fixed SeTPKG to handle changed output from "dialog --checklist" that no
+longer includes quotes.  Also handles the older versions of dialog.
++--------------------------+
+Mon Aug 12 20:50:58 UTC 2013
+Use /etc/dialogrc from the dialog package, since the syntax has changed.
++--------------------------+
+Tue Aug  6 01:46:50 UTC 2013
+Fixed a couple typos in PROMPThelp.
++--------------------------+
+Wed Jul 24 20:09:54 UTC 2013
+Added liblzo2, needed by mkfs.btrfs.
++--------------------------+
+Mon Jul 15 20:46:24 UTC 2013
+Stop removing 8021q module, which is needed to use VLANs.
++--------------------------+
+Sun Jul  7 06:48:25 UTC 2013
+Apply mancha's glibc crypt() patch to dropbear.
++--------------------------+
+Thu Jun 20 20:07:11 UTC 2013
+Add /etc/nfsmount.conf to default to use NFSv3.
++--------------------------+
+Mon Jun 10 18:49:44 UTC 2013
+Reset background color after a CD switch during installation.
++--------------------------+
+Fri Apr 19 05:43:00 UTC 2013
+In probe script (part of initrd skel), set LANG to C.
+This will avoid parsing issues if we ever i18n this thing...
++--------------------------+
+Wed Mar 27 03:37:00 UTC 2013
+By default, add nomodeset to the kernel command line.
+If modesetting is needed, boot with kms.s or kmssmp.s.
++--------------------------+
+Tue Mar 19 05:30:44 UTC 2013
+Added missing ehci-hcd module.
++--------------------------+
+Sat Mar 16 05:45:29 UTC 2013
+Modified usbboot.img to work with EFI as well.
+Don't build efiboot.img.
++--------------------------+
+Tue Mar 12 04:35:07 UTC 2013
+Keep GPU modules, needed for video on UEFI. (ADD_KMS=1)
+Support building an EFI boot image.  (EFIBOOT=1)
+Keep USB host modules, as huge.s is no longer building those in.
+Added two Terminus fonts to the initrd.
+Added setfont to busybox (needed to load an appropriate sized Terminus
+font when KMS is used).
+Patched busybox to fix a compile issue with glibc-2.17.
++--------------------------+
+Wed Feb 20 18:53:11 UTC 2013
+Support not adding network card firmware. (Stuart Winter)
++--------------------------+
+Fri Sep  7 18:06:06 UTC 2012
+Updated /sbin/rescan-scsi-bus.
++--------------------------+
+Tue Sep  4 19:06:38 UTC 2012
+Added comment=x-gvfs-show to /etc/fstab's cdrom entry.
+Increased full install size in setup to 7.3+ GB.
++--------------------------+
+Thu Aug 23 17:25:09 UTC 2012
+Include sdhci.ko and sdhci-pci.ko.
++--------------------------+
+Mon Aug 13 20:01:09 UTC 2012
+Include the staging/hv modules.
+Bind mount /dev in SeTconfig.
+Support virtual devices such as /dev/vda and /dev/xvda in /sbin/probe.
++--------------------------+
+Thu Aug  9 02:36:37 UTC 2012
+Added support for MMC devices to /sbin/probe (needed for Raspberry Pi).
+Thanks to David Spencer.
++--------------------------+
+Sat Aug  4 21:05:51 UTC 2012
+Switch from gdisk to gptdisk, and add new cgdisk and fixparts tools.
+Copy /etc/modprobe.d/ and /lib/modprobe.d/ to the installer.
++--------------------------+
+Thu Jul 26 21:52:59 UTC 2012
+Use '-s' option with eject, otherwise it fails.
+Fixed a missing space that broke a SeTnet dialog:
+-   "\nAttempting to fetch a remote configuration file using $PROTO ..."54 56
++   "\nAttempting to fetch a remote configuration file using $PROTO ..." 54 56
++--------------------------+
+Sun Jul 22 16:33:05 UTC 2012
+Added XFCE series in SeTPKG.
++--------------------------+
+Mon Jul 16 23:37:35 UTC 2012
+Add toplevel /run directory.
++--------------------------+
+Tue Jul  3 16:23:38 UTC 2012
+Allow nic=auto for headless installs.
+Fixed /sbin/probe for systems that mix HP RAID with regular hard drives.
++--------------------------+
+Tue Jul  3 03:11:40 UTC 2012
+Change location of usb.ids and pci.ids to /usr/share/hwdata.
++--------------------------+
+Mon Jul  2 04:01:09 UTC 2012
+Patched busybox to fix wget -P option.
+Thanks to Kirill Smirnoff.
++--------------------------+
+Thu Jun 28 16:42:39 UTC 2012
+Added installer-arm.diff from MoZes (identify ARM installer via dropbear)
++--------------------------+
+Thu Jun 28 16:04:57 UTC 2012
+Switch from module-init-tools to kmod.
+Added missing dosfsck (the dangling symlinks were there already :)
++--------------------------+
+Thu Apr 12 22:06:48 UTC 2012
+Fix missing bash on 32-bit by adding an i486) options section
+to build_installer.sh.
++--------------------------+
+Sat Apr  7 17:10:14 UTC 2012
+Use real GNU bash as the shell.
+Point /bin/sh -> /bin/bash
+Don't build a shell into busybox.
++--------------------------+
+Wed Mar 28 01:30:00 UTC 2012
+fixed placement of /lib{,64}/libz.so.*, danke MoZes
++--------------------------+
+Mon Mar 26 00:53:08 UTC 2012
+In SeTpartitions, use -d single -m single as it increases performance by
+about 15%, and Luigi Genoni says multiple metadata copies are useless when
+using a btrfs filesystem consisting of a single device or partition (which
+is all the installer currently supports).
++--------------------------+
+Sat Apr 23 18:17:21 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  Try to load loop device module.
+build_installer.sh:  Try to load loop device module.
+  Copy loop.ko to the installer.
++--------------------------+
+Thu Apr 21 21:20:23 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  Fixed GPT on RAID controllers.
+  Slightly less trivial.  ;-)
++--------------------------+
+Thu Apr 21 02:54:52 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  Added GPT support on RAID devices
+  in /sbin/probe.  Thanks to Greg Chandler.
+  (This was trivial, really!)
++--------------------------+
+Sun Apr 17 19:25:03 UTC 2011
+build_installer.sh:  ADD_MANPAGES to arm.
++--------------------------+
+Fri Apr 15 18:25:28 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  Merged updated skel from alienBOB
+  with PXE server changes.
++--------------------------+
+Tue Apr 12 19:21:47 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  applied skeleton_dhcpcd.diff.
++--------------------------+
+Tue Apr 12 00:19:24 UTC 2011
+Added busybox httpd applet with all options.
++--------------------------+
+Mon Apr 11 05:35:21 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  SetDOS, add umask modes for vfat
+  similar to ntfs.
++--------------------------+
+Sat Mar 26 18:58:48 UTC 2011
+build_installer.sh:  Retain virtio kernel modules.
++--------------------------+
+Sat Mar 26 04:33:40 UTC 2011
+sources/busybox/busybox-1.18.4.tar.bz2:  Upgraded.
++--------------------------+
+Fri Mar 25 04:01:51 UTC 2011
+build_installer.sh:  Add fsck.*.
+  Adjusted kernel installation to handle /kernels/memtest/memtest
+sources/initrd/skeleton_initrd.tar.gz:  rc.S, scan RAID better
++--------------------------+
+Sat Mar 19 01:40:10 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  Add terse installation mode that only
+  displays one line per package so that people's heads do not explode
++--------------------------+
+Fri Mar 18 04:44:04 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  Increase estimate of full install
+  size to "6.5+ GB"
++--------------------------+
+Tue Mar  8 05:13:38 UTC 2011
+build_installer.sh:  Add a kludgy but working man page whitelist and get
+  man pages on the x86 and x86_64 installers for partitioning tools,
+  filesystem tools, network stuff, and a few other things.
+  Added partx, findmnt, lsblk, fsfreeze, fstrim, and swaplabel.
+  Don't wipe /usr/man.
+  Use bzip2 for man pages (wins compression tests on man page text here easily)
+  ln -sf /etc/motd /root/README
+sources/initrd/skeleton_initrd.tar.gz:  Add /usr/man directory.
+  rc.S:  chmod 755 /etc/rc.d/rc.pcmcia
++--------------------------+
+Fri Mar  4 03:29:09 UTC 2011
+build_installer.sh:  Add btrfs-progs, gdisk, and gcc-g++ (for libstdc++).
+sources/initrd/skeleton_initrd.tar.gz:  support btrfs.
++--------------------------+
+Fri Feb 25 20:36:22 UTC 2011
+build_installer.sh:  Add ddrescue package.
++--------------------------+
+Fri Feb 25 05:44:11 UTC 2011
+build_installer.sh:  Support ADD_MANPAGES option
+  to add preprocessed manpages.
+  Not enabled for now.
+  This would really need a blacklist and/or whitelist first.
+sources/initrd/skeleton_initrd.tar.gz:  Replace broken zcat symlink
+  with the proper script.
+  Point /usr/bin/zcat at the zcat script.
+  Add a quick+dirty /usr/bin/man shell script to display man pages.
+sources/busybox/busybox-1.18.3.tar.bz2:  Upgraded.
+sources/busybox/busybox-dot-config:  Upgraded.
++--------------------------+
+Fri Feb 18 03:22:17 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  fdisk -l now shows HPFS/NTFS/exFAT, so
+  we need to check for NTFS before FAT in SeTDOS to avoid a false FAT detection.
++--------------------------+
+Wed Feb 16 07:45:13 UTC 2011
+build_installer.sh:  util-linux-ng -> util-linux
++--------------------------+
+Tue Feb 15 23:04:25 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  Patched /sbin/probe to add support for
+  GPT partitions.
++--------------------------+
+Fri Jan 21 16:08:24 UTC 2011
+sources/initrd/skeleton_initrd.tar.gz:  Remove /etc/modprobe.conf
+  (request from MoZes)
++--------------------------+

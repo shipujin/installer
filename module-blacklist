@@ -1,0 +1,15 @@
+c67x00.ko
+hid-a4tech.ko
+hid-chicony.ko
+hid-cypress.ko
+hid-gyration.ko
+hid-monterey.ko
+hid-petalynx.ko
+hid-pl.ko
+hid-samsung.ko
+hid-sony.ko
+hid-sunplus.ko
+i2c-dev.ko
+isp116x-hcd.ko
+isp1760.ko
+sl811-hcd.ko
